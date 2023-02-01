@@ -35,7 +35,6 @@ public:
 
     void resized() override;
 
-    // no processing just foreward it for playback
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& buffer_to_fill) override;
 
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
@@ -43,25 +42,8 @@ public:
     void releaseResources() override;
 
     void timerCallback() override;
-  
-    // draw spectrum
-    void drawFrame (juce::Graphics& g);
-
-    // audio processing ..
-    void pushNextSampleIntoFifo(float sample);
-    void drawNextFrameOfSpectrum();
 
 private:
-    // fft
-    juce::dsp::FFT forwardFFT;
-    juce::dsp::WindowingFunction<float> window;
-
-    float fifo [fftSize]; // will contain incoming audio buffer
-    float fftData [2 * fftSize]; // will contain the result of FFT calculation
-    int fifoIndex = 0;
-    bool nextFFTBlockReady = false;
-    float scopeData [scopeSize]; // will contain points to display
-
     AudioFileReaderComponent _reader;
 
     AudioReaderProcessing _dsp_processor;
