@@ -19,8 +19,8 @@ AudioFileReaderComponent::AudioFileReaderComponent()
     _stop_button.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
     _stop_button.setEnabled(false);
 
-    // to do add mp3 ..
-    _format_manager.registerBasicFormats(); // initialize manager for at least WAV and AIFF formats
+    // initialize manager for at least WAV and AIFF formats
+    _format_manager.registerBasicFormats(); 
 
     addAndMakeVisible (_track);
     _track.setSliderStyle(juce::Slider::LinearHorizontal);

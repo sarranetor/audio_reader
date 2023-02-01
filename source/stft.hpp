@@ -1,46 +1,58 @@
-// class for filtering a buffer
-// filter can be set with different filters to be applied, or only one filter? 
-// in the latter two instance of filter would be needed for filtering with two different filters
-
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_dsp/juce_dsp.h>
-#include "utils.hpp"
 
-/*
+/* enum containing the order of FFT to be computed and number of points to be displayed */
 enum fft { 
     fftOrder = 11, 
     fftSize = 1 << fftOrder, // 2^fftOrder
     scopeSize = 512 // number of points in the visual representation
-};*/
+};
 
+/* 
+    STFT is a class for computing filling a fifo array with incomung audio,
+    computing the FFT when fifo is full and drawing the result on GUI.
+*/
 class STFT 
 { 
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
 
-    float fifo [fftSize]; // will contain incoming audio buffer
-    float fftData [2 * fftSize]; // will contain the result of FFT calculation
+    // will contain incoming audio 
+    float fifo [fftSize]; 
+    // will store audio when fifo is full and will store FFT after computation.
+    // needs to be 2 * size_fft according to dsp::FFT class doc
+    float fftData [2 * fftSize]; 
     int fifoIndex = 0;
     bool nextFFTBlockReady = false;
-    float scopeData [scopeSize]; // will contain points to display
+    // will contain points to display on GUI
+    float scopeData [scopeSize]; 
 
+    /* push sample into fifo array */
     void pushNextSampleIntoFifo(float sample);
 
     public:
+
+    /* STFT constructor*/
     STFT();
 
+    /* STFT destructor*/
     ~STFT() = default;
 
+    /* Compute FFT and fill scopeData to be displayed */
     void drawNextFrameOfSpectrum();
 
+    /* Draw FFT on GUI graphics from the bottom */
     void drawFrame (juce::Graphics& g, juce::Rectangle<int> local_bounds);
 
+    /* return true if FFT block ready to be computed and there is an available frame to draw */
     bool isNextBlockReady();
 
+    /* set false when a new audio block needs to be acquired */
     void setBlockNotReady();
 
+    /* push channel of buffer_to_fill nto fifo array */
     void fillFifo(const juce::AudioSourceChannelInfo& buffer_to_fill, int channel);
 };
 
@@ -78,6 +90,7 @@ inline void STFT::pushNextSampleIntoFifo(float sample)
         }
         fifoIndex = 0;
     }
+
     fifo[fifoIndex++] = sample;
 };
 
@@ -85,23 +98,24 @@ inline void STFT::drawNextFrameOfSpectrum()
 {
     // first apply a windowing function to our data
     window.multiplyWithWindowingTable (fftData, fftSize);       
-
-    // then render our FFT data..
+    // perform FFT
     forwardFFT.performFrequencyOnlyForwardTransform (fftData);  
 
-    auto mindB = -100.0f;
-    auto maxdB =    0.0f;
+    float mindB = -100.0;
+    float maxdB =    0.0;
+    float expantion_factor = 0.4;
 
-    // scale fft to display
+    // scale fft to display and store FFT magnitude in scopeData array
     for (int i = 0; i < scopeSize; ++i)                        
     {
-        auto skewedProportionX = 1.0f - std::exp (std::log (1.0f - (float) i / (float) scopeSize) * 0.8f);
+        auto skewedProportionX = 1.0f - std::exp (std::log (1.0 - (float) i / (float) scopeSize) * expantion_factor);
         auto fftDataIndex = juce::jlimit (0, fftSize / 2, (int) (skewedProportionX * (float) fftSize * 0.5f));
+
         auto level = juce::jmap (juce::jlimit (mindB, maxdB, juce::Decibels::gainToDecibels (fftData[fftDataIndex])
                                                            - juce::Decibels::gainToDecibels ((float) fftSize)),
                                  mindB, maxdB, 0.0f, 1.0f);
 
-        scopeData[scopeSize -1 - i] = level; // not sure why needs to be filled in reverse ..                     
+        scopeData[scopeSize - i -1] = level; // not sure why need to be stored in reverse                    
     }
 };
 
