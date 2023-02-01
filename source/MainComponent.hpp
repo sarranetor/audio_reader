@@ -13,6 +13,7 @@
 #include "utils.hpp"
 #include "audioFileReaderComponent.hpp"
 #include "audioProcessing.hpp"
+#include "stft.hpp"
 
 //==============================================================================
 /*
@@ -20,13 +21,12 @@
     your controls and content.
 */
 class MainComponent   : public juce::AudioAppComponent,
-                        public juce::ChangeListener,
                         public juce::Timer
 {
 public:
     MainComponent();
 
-     ~MainComponent() override
+    ~MainComponent() override
     {
         shutdownAudio();
     }
@@ -34,10 +34,6 @@ public:
     void paint (juce::Graphics& g) override;
 
     void resized() override;
-
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
-
-    void changeState (TransportState new_state);
 
     // no processing just foreward it for playback
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& buffer_to_fill) override;
@@ -51,40 +47,12 @@ public:
     // draw spectrum
     void drawFrame (juce::Graphics& g);
 
-    // get audio file ..
-    void openButtonClicked();
-    void playButtonClicked();
-    void stopButtonClicked();
-
-    void moveTrackSlider();
-
     // audio processing ..
     void pushNextSampleIntoFifo(float sample);
     void drawNextFrameOfSpectrum();
 
 private:
-    // gui
-    juce::TextButton open_button;
-    juce::TextButton play_button;
-    juce::TextButton stop_button;
-
-    std::unique_ptr<juce::FileChooser> chooser;
-
-    juce::AudioFormatManager format_manager;
-    std::unique_ptr<juce::AudioFormatReaderSource> reader_source;
-    juce::AudioTransportSource transport_source;
-    TransportState state;
-
-    juce::Slider track;
-    juce::Label track_position;
-
-    float _range_Db = 30.0;
-    juce::Slider high_shelf_gain;
-	juce::Slider low_shelf_gain;
-    juce::TextEditor ls_text;
-    juce::TextEditor hs_text;
-
-    // audio processing
+    // fft
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
 
@@ -94,16 +62,11 @@ private:
     bool nextFFTBlockReady = false;
     float scopeData [scopeSize]; // will contain points to display
 
-    // filtering
-    float _samplerate;
-    juce::dsp::IIR::Filter<float> filter_ls;
-    juce::dsp::IIR::Filter<float> filter_hs;
-    //juce::IIRFilter filter_ls;
-    //juce::IIRFilter filter_hs;
-
     AudioFileReaderComponent _reader;
 
     AudioReaderProcessing _dsp_processor;
+
+    STFT _stft;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

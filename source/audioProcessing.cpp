@@ -64,12 +64,14 @@ void AudioReaderProcessing::getNextAudioBlock (const juce::AudioSourceChannelInf
     // ..
     _filter_ls.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (_samplerate, _ls_cut_freq, _Q, scale_gain_ls);
     _filter_hs.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (_samplerate, _hs_cut_freq, _Q, scale_gain_hs);
+    _fader.setGainDecibels(_track_gain.getValue());
 
     // ..
     juce::dsp::AudioBlock<float> block (buffer_to_fill.buffer->getArrayOfWritePointers(), 
                                         buffer_to_fill.buffer->getNumChannels(), buffer_to_fill.buffer->getNumSamples());
     _filter_ls.process(juce::dsp::ProcessContextReplacing<float> (block));
     _filter_hs.process(juce::dsp::ProcessContextReplacing<float> (block));
+    _fader.process(juce::dsp::ProcessContextReplacing<float> (block));
 };
 
 void AudioReaderProcessing::prepareToPlay (int samplesPerBlockExpected, double sampleRate) 
@@ -77,12 +79,14 @@ void AudioReaderProcessing::prepareToPlay (int samplesPerBlockExpected, double s
     _samplerate = static_cast<float>(sampleRate);
     _filter_hs.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
     _filter_ls.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
+    _fader.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
 };
 
 void AudioReaderProcessing::releaseResources() 
 {
     _filter_hs.reset();
     _filter_ls.reset();
+    _fader.reset();
 };
 
 void AudioReaderProcessing::setNChannels(unsigned int n_channels) 

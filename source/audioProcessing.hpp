@@ -24,6 +24,7 @@ class AudioReaderProcessing : public juce::Component
     unsigned int _n_channels {2};
     juce::dsp::IIR::Filter<float> _filter_ls;
     juce::dsp::IIR::Filter<float> _filter_hs;
+    juce::dsp::Gain<float> _fader;
 
     public:
     AudioReaderProcessing();

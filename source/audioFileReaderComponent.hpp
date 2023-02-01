@@ -7,6 +7,12 @@
 #ifndef AUDIOFILEREADERCOMPONENT_H
 #define AUDIOFILEREADERCOMPONENT_H
 
+enum TransportState { 
+    Stopped,
+    Starting,
+    Playing,
+    Stopping
+};
 
 class AudioFileReaderComponent : public juce::Component,
                                   public juce::ChangeListener,
