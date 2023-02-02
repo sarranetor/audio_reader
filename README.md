@@ -7,7 +7,7 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 
 ## Audio Reader App GUI Description 
 
-![reader_numbered](figs/reader_numbered.png)
+![reader_numbered](figs/reader_numbered.PNG)
 
 1. Button for choosing a WAV file to read and play
 2. Once a WAV file is chosen it can be played pressing this button
@@ -21,7 +21,7 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 
 # How to Install and Run the Projectt
 
-A ready to use executable is present in: 
+A ready to use executable for **windows** is present in: 
 
     cmake-build-dir/AudioReader_artefacts/Release/
 
