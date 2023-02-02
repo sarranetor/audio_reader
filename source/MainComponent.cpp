@@ -8,7 +8,7 @@ MainComponent::MainComponent()
     // App title
     addAndMakeVisible (_title);
     _title.setEnabled (true);
-    _title.setText ("Livio S. Effects", juce::NotificationType::dontSendNotification);
+    _title.setText ("L.S. Audio Effects", juce::NotificationType::dontSendNotification);
     _title.setFont (juce::Font (16.0f, juce::Font::italic));
     _title.setColour (juce::Label::textColourId, juce::Colours::goldenrod);
     _title.setJustificationType (juce::Justification::centred);

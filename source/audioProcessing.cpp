@@ -61,12 +61,12 @@ void AudioReaderProcessing::getNextAudioBlock (const juce::AudioSourceChannelInf
     float scale_gain_ls = std::pow(10, _low_shelf_gain.getValue() / 20); 
     float scale_gain_hs = std::pow(10, _high_shelf_gain.getValue() / 20);
 
-    // ..
+    // set dsp processors parameters
     _filter_ls.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (_samplerate, _ls_cut_freq, _Q, scale_gain_ls);
     _filter_hs.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (_samplerate, _hs_cut_freq, _Q, scale_gain_hs);
     _fader.setGainDecibels(_track_gain.getValue());
 
-    // ..
+    // process audio
     juce::dsp::AudioBlock<float> block (buffer_to_fill.buffer->getArrayOfWritePointers(), 
                                         buffer_to_fill.buffer->getNumChannels(), buffer_to_fill.buffer->getNumSamples());
     _filter_ls.process(juce::dsp::ProcessContextReplacing<float> (block));

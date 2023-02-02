@@ -1,1 +1,4 @@
-cmake-build-dir/
+cmake-build-dir/*
+!cmake-build-dir/AudioReader_artefacts/
+cmake-build-dir/AudioReader_artefacts/Debug/
+cmake-build-dir/AudioReader_artefacts/JuceLibraryCode
