@@ -1,4 +1,4 @@
-JUCE/*
+JUCE/
 
 cmake-build-dir/*
 !cmake-build-dir/AudioReader_artefacts/
