@@ -6,9 +6,11 @@ Audio Reader is a Gui app built with the JUCE framework for Audio development. A
 Moreover a few DSP blocks allow to apply a gain and change the tonal balance thanks to two shelving filter, one for low frequencies and one for high frequencies.  
 
 ## Audio Reader GUI
+
 ![](figs/reader.png)
 
 ## Audio Reader App GUI Description 
+
 ![](figs/reader_numbered.png)
 
 1. Button for choosing a WAV file to read and play
