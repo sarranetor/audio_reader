@@ -7,11 +7,11 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 
 ## Audio Reader GUI
 
-![](figs/reader.png)
+![uno](figs/reader.png)
 
 ## Audio Reader App GUI Description 
 
-![](figs/reader_numbered.png)
+![due](figs/reader_numbered.png)
 
 1. Button for choosing a WAV file to read and play
 2. Once a WAV file is chosen it can be played pressing this button
@@ -25,10 +25,22 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 
 # How to Install and Run the Projectt
 
-The executable is present in: 
+A ready to use executable is present in: 
 
     cmake-build-dir/AudioReader_artefacts/Release/
 
- 
+For building the source code Cmake [2] is used. Moreover JUCE audio framework [1] [3] is a dependency.
+The project can be nuilt in the following way:
+
+    cd ../audio_reader
+    git clone --recurse-submodules https://github.com/juce-framework/JUCE.git
+    git submodule update --init --recursive
+    cmake -B cmake-build-dir
+    cmake --build cmake-build-dir --config release
+    ./cmake-build-dir/AudioReader_artefacts/Release/audio_reader.exe
 
 # References
+
+[1] https://github.com/juce-framework/JUCE
+[2] https://github.com/juce-framework/JUCE/README cmake section
+[3] https://juce.com/learn/tutorials/
