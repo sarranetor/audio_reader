@@ -8,7 +8,7 @@ AudioReaderProcessing::AudioReaderProcessing()
     _track_gain.setTextValueSuffix(" Db");
     _track_gain.setRange(-_range_Db, _range_Db, 0.05);
     _track_gain.setValue(0.0);
-    // ..
+    // Attach label to _track_gain
     addAndMakeVisible (_gain_label);
     _gain_label.setText ("Volume", juce::NotificationType::dontSendNotification);
     _gain_label.setJustificationType (juce::Justification::centred);
@@ -20,7 +20,7 @@ AudioReaderProcessing::AudioReaderProcessing()
 	_high_shelf_gain.setTextValueSuffix(" Db");
     _high_shelf_gain.setRange(-_range_Db, _range_Db, 0.05);
     _high_shelf_gain.setValue(0.0);
-    // ..
+    // Attach label to _high_shelf_gain
     addAndMakeVisible (_hs_label);
     _hs_label.setText("Highs", juce::NotificationType::dontSendNotification);
     _hs_label.attachToComponent(&_high_shelf_gain, false);
@@ -31,7 +31,7 @@ AudioReaderProcessing::AudioReaderProcessing()
 	_low_shelf_gain.setTextValueSuffix(" Db");
     _low_shelf_gain.setRange(-_range_Db, _range_Db, 0.05);
     _low_shelf_gain.setValue(0.0);
-    // .
+    // Attach label to _low_shelf_gain
     addAndMakeVisible (_ls_label);
     _ls_label.setText("Lows", juce::NotificationType::dontSendNotification);
     _ls_label.attachToComponent(&_low_shelf_gain, false);
@@ -42,12 +42,12 @@ AudioReaderProcessing::AudioReaderProcessing()
 	_peaking_gain.setTextValueSuffix(" Db");
     _peaking_gain.setRange(-_range_Db, _range_Db, 0.05);
     _peaking_gain.setValue(0.0);
-    // .
+    // Attach label to _peaking_gain
     addAndMakeVisible (_peaking_label);
     _peaking_label.setText("Mids", juce::NotificationType::dontSendNotification);
     _peaking_label.attachToComponent(&_peaking_gain, false);
 
-    addAndMakeVisible (_disable_filt);
+    addAndMakeVisible (_disable_filt); // add toggle button
     _disable_filt.setClickingTogglesState(true);
     _disable_filt.onClick = [this] { _disable_filtering(); };
 };
