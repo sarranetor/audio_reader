@@ -10,7 +10,7 @@ MainComponent::MainComponent()
     _title.setEnabled (true);
     _title.setText ("L.S. Audio Effects", juce::NotificationType::dontSendNotification);
     _title.setFont (juce::Font (16.0f, juce::Font::italic));
-    _title.setColour (juce::Label::textColourId, juce::Colours::goldenrod);
+    _title.setColour (juce::Label::textColourId, juce::Colours::azure);
     _title.setJustificationType (juce::Justification::centred);
 
     // time listener set interval
@@ -32,7 +32,7 @@ void MainComponent::resized()
 {
     auto area = getLocalBounds();
 
-    auto title_rect = area.removeFromBottom(250);
+    auto title_rect = area.removeFromBottom(210);
     title_rect.setHeight(40);
     _title.setBounds (title_rect);
 

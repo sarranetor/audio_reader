@@ -22,7 +22,7 @@ AudioReaderProcessing::AudioReaderProcessing()
     _high_shelf_gain.setValue(0.0);
     // ..
     addAndMakeVisible (_hs_label);
-    _hs_label.setText("Brightness Filter", juce::NotificationType::dontSendNotification);
+    _hs_label.setText("Highs", juce::NotificationType::dontSendNotification);
     _hs_label.attachToComponent(&_high_shelf_gain, false);
 
     addAndMakeVisible (_low_shelf_gain);
@@ -33,8 +33,23 @@ AudioReaderProcessing::AudioReaderProcessing()
     _low_shelf_gain.setValue(0.0);
     // .
     addAndMakeVisible (_ls_label);
-    _ls_label.setText("Fullness Filter", juce::NotificationType::dontSendNotification);
+    _ls_label.setText("Lows", juce::NotificationType::dontSendNotification);
     _ls_label.attachToComponent(&_low_shelf_gain, false);
+
+    addAndMakeVisible (_peaking_gain);
+    _peaking_gain.setSliderStyle(juce::Slider::Rotary);
+	_peaking_gain.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
+	_peaking_gain.setTextValueSuffix(" Db");
+    _peaking_gain.setRange(-_range_Db, _range_Db, 0.05);
+    _peaking_gain.setValue(0.0);
+    // .
+    addAndMakeVisible (_peaking_label);
+    _peaking_label.setText("Mids", juce::NotificationType::dontSendNotification);
+    _peaking_label.attachToComponent(&_peaking_gain, false);
+
+    addAndMakeVisible (_disable_filt);
+    _disable_filt.setClickingTogglesState(true);
+    _disable_filt.onClick = [this] { _disable_filtering(); };
 };
 
 void AudioReaderProcessing::resized() 
@@ -44,11 +59,19 @@ void AudioReaderProcessing::resized()
     _gain_label.setBounds (area.removeFromTop (20));
     _track_gain.setBounds (area.removeFromTop (30));
 
+    auto disfilt_area = area.removeFromTop(20);
+    disfilt_area.reduce(90, 0);
+    _disable_filt.setBounds(disfilt_area);
+
     _hs_label.setBounds (area.removeFromTop (20));
-    auto hs_area = area.removeFromRight (150);
+    auto hs_area = area.removeFromRight (100);
     hs_area.setHeight(100);
     hs_area.setWidth(100);
     _high_shelf_gain.setBounds (hs_area);
+
+    auto p_area = area.removeFromRight (100);
+    p_area.setHeight(100);
+    _peaking_gain.setBounds (p_area);
 
     auto ls_area = area.removeFromRight (100);
     ls_area.setHeight(100);
@@ -58,12 +81,22 @@ void AudioReaderProcessing::resized()
 void AudioReaderProcessing::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffer_to_fill) 
 {
     //Db to scale factor
-    float scale_gain_ls = std::pow(10, _low_shelf_gain.getValue() / 20); 
-    float scale_gain_hs = std::pow(10, _high_shelf_gain.getValue() / 20);
+    if (!_disable_filt.getToggleState())
+    {
+        _scale_gain_ls = std::pow(10, _low_shelf_gain.getValue() / 20); 
+        _scale_gain_hs = std::pow(10, _high_shelf_gain.getValue() / 20);
+        _scale_gain_peaking = std::pow(10, _peaking_gain.getValue() / 20);
+    } else if (_disable_filt.getToggleState())
+    {
+        _scale_gain_ls = 1.0;
+        _scale_gain_hs = 1.0;
+        _scale_gain_peaking = 1.0;
+    }
 
     // set dsp processors parameters
-    _filter_ls.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (_samplerate, _ls_cut_freq, _Q, scale_gain_ls);
-    _filter_hs.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (_samplerate, _hs_cut_freq, _Q, scale_gain_hs);
+    _filter_ls.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (_samplerate, _ls_cut_freq, _Q, _scale_gain_ls);
+    _filter_mids.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (_samplerate, _peaking_freq, _Q, _scale_gain_peaking);
+    _filter_hs.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (_samplerate, _hs_cut_freq, _Q, _scale_gain_hs);
     _fader.setGainDecibels(_track_gain.getValue());
 
     // process audio
@@ -71,6 +104,7 @@ void AudioReaderProcessing::getNextAudioBlock (const juce::AudioSourceChannelInf
                                         buffer_to_fill.buffer->getNumChannels(), buffer_to_fill.buffer->getNumSamples());
     _filter_ls.process(juce::dsp::ProcessContextReplacing<float> (block));
     _filter_hs.process(juce::dsp::ProcessContextReplacing<float> (block));
+    _filter_mids.process(juce::dsp::ProcessContextReplacing<float> (block));
     _fader.process(juce::dsp::ProcessContextReplacing<float> (block));
 };
 
@@ -79,6 +113,7 @@ void AudioReaderProcessing::prepareToPlay (int samplesPerBlockExpected, double s
     _samplerate = static_cast<float>(sampleRate);
     _filter_hs.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
     _filter_ls.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
+    _filter_mids.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
     _fader.prepare({sampleRate, static_cast<unsigned int>(samplesPerBlockExpected), _n_channels});
 };
 
@@ -86,10 +121,27 @@ void AudioReaderProcessing::releaseResources()
 {
     _filter_hs.reset();
     _filter_ls.reset();
+    _filter_mids.reset();
     _fader.reset();
 };
 
 void AudioReaderProcessing::setNChannels(unsigned int n_channels) 
 {
     _n_channels = n_channels;
+};
+
+void AudioReaderProcessing::_disable_filtering()
+{
+    bool state = _disable_filt.getToggleState();
+    if (state == true)
+    {
+        _low_shelf_gain.setEnabled(false);
+        _high_shelf_gain.setEnabled(false);
+        _peaking_gain.setEnabled(false);
+    } else if (state == false) 
+    {
+        _low_shelf_gain.setEnabled(true);
+        _high_shelf_gain.setEnabled(true);
+        _peaking_gain.setEnabled(true);
+    }
 };
