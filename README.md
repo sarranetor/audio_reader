@@ -21,7 +21,7 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 10. Peaking filter with centre frequency of 700Hz. It can boost or cut the mid range frequencies of the audio.
 11. High Shelving filter with cut frequency of 2000Hz. It can boost or cut the high end of audio signal. 
 
-# How to Install and Run the Projectt
+# How to Install and Run the Project
 
 A ready to use executable for **windows** is present in: 
 
