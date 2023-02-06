@@ -37,6 +37,8 @@ The project can be built in the following way:
     cmake --build cmake-build-dir --config release
     ./cmake-build-dir/AudioReader_artefacts/Release/audio_reader.exe
 
+Note: In resources folder there is a test WAV file to load into the audio reader application. 
+
 # References
 
 [1] https://github.com/juce-framework/JUCE
