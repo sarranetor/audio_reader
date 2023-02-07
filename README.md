@@ -16,7 +16,7 @@ Moreover a few DSP blocks allow to apply a gain and change the tonal balance tha
 5. Label for displaying reproduction time of the track.
 6. When the audio is playing FFT is computed in real-time and shown.
 7. Slider to change vulume, applys a gain in Db.
-8. Toggle button to disable or enabling the filtering. When clicked the three filters are sisabled and the original audio is played.
+8. Toggle button to disable or enabling the filtering. When clicked the three filters are disabled and the original audio is played.
 9. Low Shelving filter with cut frequency of 400Hz. It can boost or cut the low end of the audio signal.
 10. Peaking filter with centre frequency of 700Hz. It can boost or cut the mid range frequencies of the audio.
 11. High Shelving filter with cut frequency of 2000Hz. It can boost or cut the high end of audio signal. 
